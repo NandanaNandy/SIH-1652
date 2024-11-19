@@ -1,0 +1,50 @@
+import fasttext
+import logging
+from datetime import datetime
+
+class DocumentProcessorFastText:
+    def __init__(self, model_path="lid.176.bin"):
+        self.logger = self.setup_logging()
+        self.lang_detector = self.load_fasttext_model(model_path)
+
+    def setup_logging(self):
+        log_file = f"processing_{datetime.now().strftime('%Y-%m-%d')}.log"
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s - %(levelname)s - %(message)s",
+            handlers=[logging.FileHandler(log_file), logging.StreamHandler()],
+        )
+        return logging.getLogger(__name__)
+
+    def load_fasttext_model(self, model_path):
+        self.logger.info("Loading fastText model for language detection...")
+        return fasttext.load_model(model_path)
+
+    def analyze_languages(self, text):
+        predictions = self.lang_detector.predict(text, k=3)  # Top-3 predictions
+        predictions = [(lang.replace("__label__", ""), prob) for lang, prob in zip(predictions[0], predictions[1])]
+        total_prob = sum(prob for _, prob in predictions)
+        return {lang: round((prob / total_prob) * 100, 2) for lang, prob in predictions}
+
+    def process_text(self, text):
+        lang_results = self.analyze_languages(text)
+        return lang_results
+
+
+def main_fasttext():
+    processor = DocumentProcessorFastText()
+
+    while True:
+        text_input = input("Enter the text for analysis (or type 'exit' to quit): ").strip()
+        if text_input.lower() == 'exit':
+            print("Exiting program.")
+            break
+
+        lang_results = processor.process_text(text_input)
+        print("\n--- Language Detection Results ---")
+        for lang, percentage in lang_results.items():
+            print(f"{lang}: {round(percentage, 2)}%")
+        print("----------------------------\n")
+
+if __name__ == "__main__":
+    main_fasttext()
