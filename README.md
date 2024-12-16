@@ -1,6 +1,6 @@
 # EXTRACTION AND VERIFICATION OF INFORMATION FROM SEMI-CATEGORIZED DATA
 
-## [version-2](./v2) `LIVE`
+## [version-3](./v2) `LIVE`
 
 ### DETAILS AND DESCRIPTIONS:
 - problem description - [click here](./v2/problem-desc.md)
